@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dp-ms-sample
+  namespace: argocd
+spec:
+  destination:
+    name: ""
+    namespace: namespace1
+    server: "https://kubernetes.default.svc"
+  syncPolicy:
+    automated:
+      selfHeal: true
+  source:
+    path: ""
+    repoURL: <aws-account-id>.dkr.ecr.<region>.amazonaws.com
+    targetRevision: 3.0.*
+    chart: sampleservice
+    helm:
+      valueFiles:
+        - values.yaml
+      values: |-
+        service:
+          type: NodePort
+          port: "1947"
+          useStaticNodePort: true
+          staticNodePort: "31006"
+
+        hostMountPath: "/opt/data"
+
+        resources:
+          limits:
+            memory: "1000Mi"
+          requests:
+            memory: "700Mi"
+
+        replicaCount: "1"
+  sources: []
+  project: default
